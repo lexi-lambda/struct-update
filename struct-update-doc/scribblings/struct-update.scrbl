@@ -51,6 +51,22 @@ lexical context of @racket[struct-id]. Each setter function is protected by the 
   (define-struct-updaters point)
   (point-x-set (point 1 2) 10)
   (point-y-update (point 1 2) add1))
+
+If @racket[struct-id] is a substruct of @racketvarfont{super-id}, then it generates setters and
+updaters for the super fields as well. These are generated as
+@elem{@racket[struct-id]@racketidfont{-}@racketvarfont{super-id}@racketidfont{-}@racket[field-id]@racket[-set]} and
+@elem{@racket[struct-id]@racketidfont{-}@racketvarfont{super-id}@racketidfont{-}@racket[field-id]@racket[-update]}
+so that they can return instances of @racket[struct-id] instead of @racketvarfont{super-id}.
+
+@(struct-update-eval
+  (struct object (mass position) #:transparent)
+  (struct movable object (velocity) #:transparent)
+  (define-struct-updaters object)
+  (define-struct-updaters movable)
+  (object-mass-set (object 5 (list 1 2)) 10)
+  (object-mass-set (movable 5 (list 1 2) (list 0 0)) 10)
+  (movable-velocity-set (movable 5 (list 1 2) (list 0 0)) (list -3 -4))
+  (movable-object-mass-set (movable 5 (list 1 2) (list 0 0)) 10))
 }}}
 
 @defform[(struct-updaters-out struct-id)]{
