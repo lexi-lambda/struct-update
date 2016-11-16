@@ -34,12 +34,18 @@
       ; perform the functional update
       #:attr constructor-id (@ struct.constructor-id)
       #:with ([set-id update-id accessor-id [pre-accessor-id ...] [post-accessor-id ...]] ...)
-             (for/list ([(accessor-id index) (in-indexed (in-list (@ struct.own-accessor-id)))])
-              (let-values ([[pre current+post] (split-at (@ struct.accessor-id)
-                                                         (+ (@ struct.num-supertype-fields) index))])
-                (list (format-id #'struct "~a-set" accessor-id #:source #'struct #:props #'struct)
-                      (format-id #'struct "~a-update" accessor-id #:source #'struct #:props #'struct)
-                      accessor-id pre (rest current+post))))]))
+             (for/list ([(accessor-id index) (in-indexed (in-list (@ struct.accessor-id)))])
+                (let-values ([[pre current+post] (split-at (@ struct.accessor-id)
+                                                           index)])
+                  (cond
+                    [(< index (@ struct.num-supertype-fields))
+                     (list (format-id #'struct "~a-~a-set" #'struct accessor-id #:source #'struct #:props #'struct)
+                           (format-id #'struct "~a-~a-update" #'struct accessor-id #:source #'struct #:props #'struct)
+                           accessor-id pre (rest current+post))]
+                    [else
+                     (list (format-id #'struct "~a-set" accessor-id #:source #'struct #:props #'struct)
+                           (format-id #'struct "~a-update" accessor-id #:source #'struct #:props #'struct)
+                           accessor-id pre (rest current+post))])))]))
 
 (define-syntax (define-struct-updaters stx)
   (with-disappeared-uses
