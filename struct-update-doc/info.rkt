@@ -10,4 +10,5 @@
   '("base"
     "racket-doc"
     "scribble-lib"
-    "struct-update-lib"))
+    "struct-update-lib"
+    "lens-doc"))
